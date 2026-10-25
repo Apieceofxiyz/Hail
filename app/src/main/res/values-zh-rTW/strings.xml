@@ -32,6 +32,8 @@
     <string name="action_export_clipboard">匯出至剪貼簿</string>
     <string name="action_import_clipboard">從剪貼簿匯入</string>
     <string name="action_remove_home">從首頁中移除</string>
+    <string name="action_hide">隱藏</string>
+    <string name="action_unhide">取消隱藏</string>
     <string name="action_deselect">取消選取</string>
     <string name="action_undo">復原</string>
     <string name="action_help">說明</string>

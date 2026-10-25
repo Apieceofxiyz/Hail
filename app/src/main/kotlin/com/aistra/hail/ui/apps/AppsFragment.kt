@@ -123,6 +123,11 @@ class AppsFragment : MainFragment(), AppsAdapter.OnItemClickListener, AppsAdapte
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateDisplayAppList()
+    }
+
     override fun onItemClick(buttonView: CompoundButton) {
 //        buttonView.toggle()
     }
@@ -198,9 +203,11 @@ class AppsFragment : MainFragment(), AppsAdapter.OnItemClickListener, AppsAdapte
     override fun onItemCheckedChange(
         buttonView: CompoundButton, isChecked: Boolean, packageName: String
     ) {
+        val wasHidden = HailData.isHidden(packageName)
         if (isChecked) HailData.addCheckedApp(packageName)
         else HailData.removeCheckedApp(packageName)
         buttonView.isChecked = HailData.isChecked(packageName)
+        if (wasHidden) updateDisplayAppList()
     }
 
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {

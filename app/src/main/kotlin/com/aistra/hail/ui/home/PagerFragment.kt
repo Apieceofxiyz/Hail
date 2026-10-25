@@ -131,17 +131,22 @@ class PagerFragment : MainFragment(), PagerAdapter.OnItemClickListener, PagerAda
         }
     }
 
-    private fun updateCurrentList() = HailData.checkedList.filter {
-        if (query.isEmpty()) tag?.second?.let { tagId -> tagId in it.tagIdList } ?: false
-        else ((HailData.nineKeySearch && NineKeySearch.search(
-            query, it.packageName, it.name.toString()
-        )) || FuzzySearch.search(it.packageName, query) || FuzzySearch.search(
-            it.name.toString(), query
-        ) || PinyinSearch.searchPinyinAll(it.name.toString(), query))
-    }.sortedWith(NameComparator).let {
-        binding.empty.isVisible = it.isEmpty()
-        pagerAdapter.submitList(it)
-        app.setAutoFreezeService()
+    private fun updateCurrentList() {
+        val search = PrivateSearch(query)
+        val keyword = search.keyword
+        HailData.checkedList.filter {
+            search.includes(it.hidden) && if (!search.isPrivate && keyword.isEmpty()) {
+                tag?.second?.let { tagId -> tagId in it.tagIdList } ?: false
+            } else ((HailData.nineKeySearch && NineKeySearch.search(
+                keyword, it.packageName, it.name.toString()
+            )) || FuzzySearch.search(it.packageName, keyword) || FuzzySearch.search(
+                it.name.toString(), keyword
+            ) || PinyinSearch.searchPinyinAll(it.name.toString(), keyword))
+        }.sortedWith(NameComparator).let {
+            binding.empty.isVisible = it.isEmpty()
+            pagerAdapter.submitList(it)
+            app.setAutoFreezeService()
+        }
     }
 
     private fun updateBarTitle() {
@@ -186,10 +191,12 @@ class PagerFragment : MainFragment(), PagerAdapter.OnItemClickListener, PagerAda
                     R.string.action_whitelist
                 ) || !info.whitelisted) && (it != getString(R.string.action_remove_whitelist) || info.whitelisted) && (it != getString(
                     R.string.action_unfreeze_remove_home
-                ) || frozen)
+                ) || frozen) && (it != getString(R.string.action_hide) || !info.hidden) && (it != getString(
+                    R.string.action_unhide
+                ) || info.hidden)
             }.toTypedArray()
         ) { _, which ->
-            when (which) {
+            when (if (!frozen && which >= 9) which + 1 else which) {
                 0 -> launchApp(pkg)
                 1 -> setListFrozen(!frozen, listOf(info))
                 2 -> {
@@ -246,6 +253,15 @@ class PagerFragment : MainFragment(), PagerAdapter.OnItemClickListener, PagerAda
                 9 -> {
                     setListFrozen(false, listOf(info), false)
                     if (!AppManager.isAppFrozen(pkg)) removeCheckedApp(pkg)
+                }
+
+                10 -> {
+                    info.hidden = !info.hidden
+                    HailData.saveApps()
+                    if (info.hidden) HShortcuts.removeDynamicShortcut(pkg)
+                    selectedList.remove(info)
+                    updateCurrentList()
+                    updateBarTitle()
                 }
             }
         }.setNeutralButton(R.string.action_details) { _, _ ->

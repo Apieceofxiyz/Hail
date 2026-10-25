@@ -109,4 +109,5 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.hiddenapibypass)
     compileOnly(libs.libxposed.api)
+    testImplementation("junit:junit:4.13.2")
 }

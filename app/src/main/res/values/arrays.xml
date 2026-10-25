@@ -22,6 +22,8 @@
         <item>@string/action_export_clipboard</item>
         <item>@string/action_remove_home</item>
         <item>@string/action_unfreeze_remove_home</item>
+        <item>@string/action_hide</item>
+        <item>@string/action_unhide</item>
     </string-array>
     <string-array name="apps_action_entries">
         <item>@string/action_details</item>

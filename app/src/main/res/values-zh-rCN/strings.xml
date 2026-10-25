@@ -33,6 +33,8 @@
     <string name="action_import_clipboard">从剪切板导入</string>
     <string name="action_remove_home">从首页中移除</string>
     <string name="action_unfreeze_remove_home">解冻并从首页中移除</string>
+    <string name="action_hide">隐藏</string>
+    <string name="action_unhide">取消隐藏</string>
     <string name="action_deselect">取消选择</string>
     <string name="action_undo">撤销</string>
     <string name="action_help">帮助</string>

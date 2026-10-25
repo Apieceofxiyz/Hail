@@ -88,6 +88,9 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
         query: String?
     ): List<ApplicationInfo> {
         val pm = getApplication<HailApp>().packageManager
+        val search = PrivateSearch(query)
+        val keyword = search.keyword
+        val hiddenPackages = HailData.checkedList.filter { it.hidden }.map { it.packageName }.toSet()
         return withContext(Dispatchers.Default) {
             return@withContext appList.filter {
                 ((HailData.filterUserApps && !it.isSystemApp)
@@ -95,12 +98,13 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
 
                         && ((HailData.filterFrozenApps && it.isAppFrozen)
                         || (HailData.filterUnfrozenApps && !it.isAppFrozen))
+                        && search.includes(it.packageName in hiddenPackages)
                         // Search apps
                         && ((HailData.nineKeySearch
-                        && (NineKeySearch.search(query, it.packageName, it.loadLabel(pm).toString())))
-                        || FuzzySearch.search(it.packageName, query)
-                        || FuzzySearch.search(it.loadLabel(pm).toString(), query)
-                        || PinyinSearch.searchPinyinAll(it.loadLabel(pm).toString(), query))
+                        && (NineKeySearch.search(keyword, it.packageName, it.loadLabel(pm).toString())))
+                        || FuzzySearch.search(it.packageName, keyword)
+                        || FuzzySearch.search(it.loadLabel(pm).toString(), keyword)
+                        || PinyinSearch.searchPinyinAll(it.loadLabel(pm).toString(), keyword))
             }.run {
                 when (HailData.sortBy) {
                     HailData.SORT_INSTALL -> sortedBy {

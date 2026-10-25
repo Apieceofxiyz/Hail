@@ -49,7 +49,7 @@ object HShortcuts {
     }
 
     fun addDynamicShortcut(packageName: String) {
-        if (HailData.biometricLogin) return
+        if (HailData.biometricLogin || HailData.isHidden(packageName)) return
         val applicationInfo = HPackages.getApplicationInfoOrNull(packageName)
         val shortcut =
             ShortcutInfoCompat.Builder(app, packageName.hashCode().toString()) // Make id different from pin
@@ -93,6 +93,10 @@ object HShortcuts {
             )
         ).setShortLabel(app.getString(label)).setIntent(Intent(id)).build()
         ShortcutManagerCompat.pushDynamicShortcut(app, shortcut)
+    }
+
+    fun removeDynamicShortcut(packageName: String) {
+        ShortcutManagerCompat.removeDynamicShortcuts(app, listOf(packageName.hashCode().toString()))
     }
 
     fun removeAllDynamicShortcuts() {
